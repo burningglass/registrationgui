@@ -7,7 +7,6 @@ export default class Greeting extends React.Component {
   }
 
   render() {
-    alert(JSON.stringify(this.props));
     let message = (this.props.body)
       ? `Hi ${this.props.body.email}!`
       : 'You\'re not logged in.';

@@ -14,7 +14,10 @@ class App extends React.Component {
     //Initial state
     this.state = {
       body: { email: "", loggedIn: false },
-      errors: []
+      errors: [],
+      records: [],
+      models: [],
+      colours: [],
     };
   }
 
@@ -31,6 +34,24 @@ class App extends React.Component {
         body: response
       })
     );
+
+    //e.g. fetch("http://localhost:3001/models"...)
+    fetch(process.env.REACT_APP_LIST_MODELS_URI)
+    .then(response => response.json())
+    .then(response => this.setState(
+      {
+        models: response
+      })
+    );
+
+    //e.g. fetch("http://localhost:3001/colours"...)
+    fetch(process.env.REACT_APP_LIST_COLOURS_URI)
+    .then(response => response.json())
+    .then(response => this.setState(
+      {
+        colours: response
+      })
+    );
   }
 
   validate = () => {
@@ -40,36 +61,121 @@ class App extends React.Component {
       errors.push("First Name is mandatory and must be <= 25 characters.");
     }
 
+    if (document.getElementById("lastName").value.length < 1 || document.getElementById("lastName").value.length > 25) {
+      errors.push("Last Name is mandatory and must be <= 25 characters.");
+    }
+
+    if (document.getElementById("phoneNumber").value.length < 1) {
+      errors.push("Phone Number is mandatory");
+    }
+
+    var regExValidator = new RegExp("^\\+(?:[0-9] ?){6,14}[0-9]$");
+
+    if (!regExValidator.test(document.getElementById("phoneNumber").value)) {
+      errors.push("Phone Number is invalid");
+    }
+
+    var modelId = this.selectValue("modelId");
+
+    if (modelId == -1) {
+      errors.push("It is mandatory to select a model");
+    }
+
+    var colourId = this.selectValue("colourId");
+
+    if (colourId == -1) {
+      errors.push("It is mandatory to select a colour");
+    }
+
     return errors;
   }
 
-  handleSubmit = (event) => {
+  selectValue = (name) => {
+    var els = document.getElementsByName(name);
+
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].checked) {
+        return els[i].value;
+      }
+    }
+
+    return -1;
+  }
+
+  clearOptions = (name) => {
+    var els = document.getElementsByName(name);
+
+    for (var i = 0; i < els.length; i++) {
+      if (els[i].checked) {
+        els[i].checked = false;
+      }
+    }
+  }
+
+  clearInputs = () => {
+    document.getElementById("firstName").value = "";
+    document.getElementById("lastName").value = "";
+    document.getElementById("phoneNumber").value = "";
+
+    this.clearOptions("modelId");
+    this.clearOptions("colourId");
+
+    document.getElementById("isAutomatic").checked = false;
+  }
+
+  handleSubmit = async(event) => {
     event.preventDefault();
 
     const errors = this.validate();
 
     if (errors.length == 0) {
-      alert("Do something");
+      var modelId = this.selectValue("modelId");
+      var colourId = this.selectValue("colourId");
+      var isAutomatic = false;
+
+      if (document.getElementById("isAutomatic").checked) {
+        isAutomatic = true;
+      }
+
+      const response = await fetch('http://localhost:3001/registrations', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          "userName": document.getElementById("userName").value,
+          "firstName": document.getElementById("firstName").value,
+          "lastName": document.getElementById("lastName").value,
+          "phoneNumber": document.getElementById("phoneNumber").value,
+          "modelId": modelId,
+          "colourId": colourId,
+          "isAutomatic": isAutomatic,
+        })
+      });
+
+      this.clearInputs();
+
+      if (response.status == 201) {
+        alert ('Registration submitted successfully');
+
+        const response = await fetch('http://localhost:3001/registrations', {
+          method: 'POST',
+          headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            "userName": document.getElementById("userName").value,
+          })
+        })
+        .then(response => response.json())
+        .then(response => this.setState(
+          {
+            records: response
+          })
+        );
+      } else {
+        alert ('Error occurred submitting registration');
+      }
     }
 
     //Set or clear errors
     this.setState({ errors });
-  }
-
-  handleNewRegistration() {
-    fetch('http://localhost:5000/registrations', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        "userName": "smithj",
-        "firstName": "John",
-        "lastName": "Smith",
-        "phoneNumber": "+44 20 7470 0000",
-        "modelId": "1",
-        "colourId": "2",
-        "isAutomatic": "True",
-      })
-    });
   }
 
   //Render event
@@ -87,7 +193,7 @@ class App extends React.Component {
     }
     else
     {
-    const { errors } = this.state;
+    const { errors, records, models, colours } = this.state;
     return (
       <div id='App' className="p-3">
         <header>
@@ -95,60 +201,75 @@ class App extends React.Component {
           <Greeting body={this.state.body} />
           <a href="http://localhost:3001/logout">Logout</a>
         </header>
-        <br />
         <div className="p-3">
           <form id="registrationForm" name="registrationForm" onSubmit={this.handleSubmit} noValidate>
-            <input type="text" id="username" name="username" value={this.state.body.email} readOnly /><br/>
+            <input type="hidden" id="userName" name="userName" value={this.state.body.email} readOnly /><br/>
 
-            <legend>Re-enter contact details</legend>
+            <legend>Register Interest</legend>
 
-            <label for="firstName">First name:</label><br/>
+            <label htmlFor="firstName">First name:</label><br/>
             <input type="text" id="firstName" name="firstName" /><br/>
 
-            <label for="lastName">Last name:</label><br/>
+            <label htmlFor="lastName">Last name:</label><br/>
             <input type="text" id="lastName" name="lastName" /><br/>
 
-            <label for="phoneNumber">Phone Number:</label><br/>
+            <label htmlFor="phoneNumber">Phone Number:</label><br/>
             <input type="text" id="phoneNumber" name="phoneNumber" /><br/>
 
             <br/>
             <label>Model</label><br/>
 
-            <input type="radio" id="optionModelX" name="optionModelX" value="1" />
-            <label for="optionModelX">&nbsp;Model X</label><br/>
-
-            <input type="radio" id="optionModelY" name="optionModelY" value="2" />
-            <label for="optionModelY">&nbsp;Model Y</label><br/>
-
-            <input type="radio" id="optionModelZ" name="optionModelZ" value="3" />
-            <label for="optionModelZ">&nbsp;Model Z</label><br/>
+            {models.map((model) => (
+              <span><input type='radio' name='modelId' value={model.modelId} />&nbsp;{model.modelName}<br/></span>
+            ))}
 
             <br/>
             <label>Colour</label><br/>
 
-            <input type="radio" id="optionRed" name="optionRed" value="1" />
-            <label for="optionRed">&nbsp;Red</label><br/>
-
-            <input type="radio" id="optionGreen" name="optionGreen" value="2" />
-            <label for="optionGreen">&nbsp;Green</label><br/>
-
-            <input type="radio" id="optionBlue" name="optionBlue" value="3" />
-            <label for="optionBlue">&nbsp;Blue</label><br/>
+            {colours.map((colour) => (
+              <span><input type='radio' name='colourId' value={colour.colourId} />&nbsp;{colour.colourName}<br/></span>
+            ))}
 
             <br/>
-            <label>Automatic Drive?</label><br/>
-
-            <input type="checkbox" id="isAutomatic" name="isAutomatic" value="1" />&nbsp;Yes<br/>
-            <input type="checkbox" id="isAutomatic" name="isAutomatic" value="0" />&nbsp;No<br/>
+            <input type="checkbox" id="isAutomatic" name="isAutomatic" />&nbsp;Automatic Drive?<br/>
 
             <br/>
             <input type="submit" value="Register" />
 
-            <br/>
+            <br/><br/>
             {errors.map((error) => (
               <p key={error}>Error: {error}</p>
             ))}
           </form>
+        </div>
+        <legend>Interest Registrations</legend>
+        <div className="p-3">
+          <table class="table">
+          <thead>
+              <tr>
+                <td>User Name</td>
+                <td>First Name</td>
+                <td>Last Name</td>
+                <td>Phone Number</td>
+                <td>Model</td>
+                <td>Colour</td>
+                <td>Automatic?</td>
+              </tr>
+          </thead>
+          <tbody>
+          {records.map((record) => (
+              <tr>
+                <td>{record.userName}</td>
+                <td>{record.firstName}</td>
+                <td>{record.lastName}</td>
+                <td>{record.phoneNumber}</td>
+                <td>{record.modelId}</td>
+                <td>{record.colourId}</td>
+                <td>{record.isAutomatic == true ? "Y" : "N"}</td>
+              </tr>
+          ))}
+          </tbody>
+          </table>
         </div>
       </div>    
     );
