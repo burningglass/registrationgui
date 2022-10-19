@@ -4,9 +4,10 @@ import Greeting from './components/Greeting.jsx'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-//App (outer) component
+// App (outer) component
 //  (Since >= react-scripts@0.2.3 is used, no need to require('dotenv') for process.env.* to work)
 //  (process.env.* will automatically pick up env vars overridden by the .env file)
+//
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -14,17 +15,18 @@ class App extends React.Component {
     //Initial state
     this.state = {
       body: { email: "", loggedIn: false },
-      errors: [],
-      records: [],
       models: [],
       colours: [],
+      errors: [],
+      records: [],
     };
   }
 
-  //Pre-render event
+  // Pre-render event
   componentDidMount() {
-    //e.g. fetch("http://localhost:3001/user"...)
-    //Note. Send user credentials (cookies, basic http auth, etc.) despite API receiving this 'cross-origin'
+    // e.g. fetch("http://localhost:3001/user"...)
+    // Note. Send user credentials (cookies, basic http auth, etc.) despite API receiving this 'cross-origin'
+    //
     fetch(process.env.REACT_APP_LOOKUP_ACTIVEUSER_URI, {
       credentials: 'include' 
     })
@@ -36,7 +38,8 @@ class App extends React.Component {
     );
 
     //e.g. fetch("http://localhost:3001/models"...)
-    fetch(process.env.REACT_APP_LIST_MODELS_URI)
+    //
+    fetch(process.env.REACT_APP_MODELS_URI)
     .then(response => response.json())
     .then(response => this.setState(
       {
@@ -45,7 +48,8 @@ class App extends React.Component {
     );
 
     //e.g. fetch("http://localhost:3001/colours"...)
-    fetch(process.env.REACT_APP_LIST_COLOURS_URI)
+    //
+    fetch(process.env.REACT_APP_COLOURS_URI)
     .then(response => response.json())
     .then(response => this.setState(
       {
@@ -54,42 +58,36 @@ class App extends React.Component {
     );
   }
 
-  validate = () => {
-    const errors = [];
-
-    if (document.getElementById("firstName").value.length < 1 || document.getElementById("firstName").value.length > 25) {
-      errors.push("First Name is mandatory and must be <= 25 characters.");
-    }
-
-    if (document.getElementById("lastName").value.length < 1 || document.getElementById("lastName").value.length > 25) {
-      errors.push("Last Name is mandatory and must be <= 25 characters.");
-    }
-
-    if (document.getElementById("phoneNumber").value.length < 1) {
-      errors.push("Phone Number is mandatory");
-    }
-
-    var regExValidator = new RegExp("^\\+(?:[0-9] ?){6,14}[0-9]$");
-
-    if (!regExValidator.test(document.getElementById("phoneNumber").value)) {
-      errors.push("Phone Number is invalid");
-    }
+  // Return any validation errors
+  //
+  validate = async() => {
+    var errors = [];
 
     var modelId = this.selectValue("modelId");
-
-    if (modelId == -1) {
-      errors.push("It is mandatory to select a model");
-    }
-
     var colourId = this.selectValue("colourId");
 
-    if (colourId == -1) {
-      errors.push("It is mandatory to select a colour");
-    }
+    //e.g. await fetch('http://localhost:3001/validationErrors')
+    //
+    const response = await fetch(process.env.REACT_APP_VALIDATION_ERRORS_URI, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          "userName": document.getElementById("userName").value,
+          "firstName": document.getElementById("firstName").value,
+          "lastName": document.getElementById("lastName").value,
+          "phoneNumber": document.getElementById("phoneNumber").value,
+          "modelId": modelId,
+          "colourId": colourId,
+        })
+      })
+    .then(response => response.json())
+    .then(response => errors = response)
 
     return errors;
   }
 
+  // Return the DropDown value where it is checked/set
+  //
   selectValue = (name) => {
     var els = document.getElementsByName(name);
 
@@ -102,6 +100,8 @@ class App extends React.Component {
     return -1;
   }
 
+  // Clear any checked/set radio inputs
+  //
   clearOptions = (name) => {
     var els = document.getElementsByName(name);
 
@@ -112,6 +112,8 @@ class App extends React.Component {
     }
   }
 
+  // Clear all form fields
+  //
   clearInputs = () => {
     document.getElementById("firstName").value = "";
     document.getElementById("lastName").value = "";
@@ -123,10 +125,12 @@ class App extends React.Component {
     document.getElementById("isAutomatic").checked = false;
   }
 
+  // Submit data (e.g. validate and write registration record)
+  //
   handleSubmit = async(event) => {
     event.preventDefault();
 
-    const errors = this.validate();
+    const errors = await this.validate();
 
     if (errors.length == 0) {
       var modelId = this.selectValue("modelId");
@@ -205,7 +209,7 @@ class App extends React.Component {
           <form id="registrationForm" name="registrationForm" onSubmit={this.handleSubmit} noValidate>
             <input type="hidden" id="userName" name="userName" value={this.state.body.email} readOnly /><br/>
 
-            <legend>Register Interest</legend>
+            <legend>Register Customer's Interest</legend>
 
             <label htmlFor="firstName">First name:</label><br/>
             <input type="text" id="firstName" name="firstName" /><br/>
@@ -242,7 +246,7 @@ class App extends React.Component {
             ))}
           </form>
         </div>
-        <legend>Interest Registrations</legend>
+        <legend>Customer Interest Registrations</legend>
         <div className="p-3">
           <table class="table">
           <thead>
