@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Greeting from './components/Greeting.jsx'
+import Greeting from './components/Greeting.js'
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -27,7 +27,7 @@ class App extends React.Component {
     // e.g. fetch("http://localhost:3001/user"...)
     // Note. Send user credentials (cookies, basic http auth, etc.) despite API receiving this 'cross-origin'
     //
-    fetch(process.env.REACT_APP_LOOKUP_ACTIVEUSER_URI, {
+    fetch(process.env.REACT_APP_GET_ACTIVEUSER_URI, {
       credentials: 'include' 
     })
     .then(response => response.json())
@@ -39,7 +39,7 @@ class App extends React.Component {
 
     //e.g. fetch("http://localhost:3001/models"...)
     //
-    fetch(process.env.REACT_APP_MODELS_URI)
+    fetch(process.env.REACT_APP_GET_MODELS_URI)
     .then(response => response.json())
     .then(response => this.setState(
       {
@@ -49,7 +49,7 @@ class App extends React.Component {
 
     //e.g. fetch("http://localhost:3001/colours"...)
     //
-    fetch(process.env.REACT_APP_COLOURS_URI)
+    fetch(process.env.REACT_APP_GET_COLOURS_URI)
     .then(response => response.json())
     .then(response => this.setState(
       {
@@ -68,7 +68,7 @@ class App extends React.Component {
 
     //e.g. await fetch('http://localhost:3001/validationErrors')
     //
-    const response = await fetch(process.env.REACT_APP_VALIDATION_ERRORS_URI, {
+    await fetch(process.env.REACT_APP_GET_VALIDATION_ERRORS_URI, {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -132,7 +132,8 @@ class App extends React.Component {
 
     const errors = await this.validate();
 
-    if (errors.length == 0) {
+    if (errors.length === 0) {
+      // Submit new registration (valid data)
       var modelId = this.selectValue("modelId");
       var colourId = this.selectValue("colourId");
       var isAutomatic = false;
@@ -141,7 +142,7 @@ class App extends React.Component {
         isAutomatic = true;
       }
 
-      const response = await fetch('http://localhost:3001/registrations', {
+      const response = await fetch(process.env.REACT_APP_REGISTRATION_OPS_URI, {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -157,10 +158,11 @@ class App extends React.Component {
 
       this.clearInputs();
 
-      if (response.status == 201) {
+      if (response.status === 201) {
         alert ('Registration submitted successfully');
 
-        const response = await fetch('http://localhost:3001/registrations', {
+        // Requery/ redisplay all registrations
+        await fetch(process.env.REACT_APP_REGISTRATION_OPS_URI, {
           method: 'POST',
           headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -189,8 +191,8 @@ class App extends React.Component {
       <div id='App' className="p-3">
         <header>
           <h1>MyAutoSite - Welcome!</h1>
-          <p>Please register an account by calling our Sales +44 20 7000 0000</p>
-          <a href="http://localhost:3001/login">Login</a>        
+          <p>Please register an account by calling Helpdesk: +44 20 7000 0000</p>
+          <a href={process.env.REACT_APP_LOGIN_URI}>Login</a>        
         </header>
       </div>
     );
@@ -203,7 +205,7 @@ class App extends React.Component {
         <header>
           <h1>MyAutoSite - Welcome!</h1>
           <Greeting body={this.state.body} />
-          <a href="http://localhost:3001/logout">Logout</a>
+          <a href={process.env.REACT_APP_LOGOUT_URI}>Logout</a>
         </header>
         <div className="p-3">
           <form id="registrationForm" name="registrationForm" onSubmit={this.handleSubmit} noValidate>
@@ -269,7 +271,7 @@ class App extends React.Component {
                 <td>{record.phoneNumber}</td>
                 <td>{record.modelId}</td>
                 <td>{record.colourId}</td>
-                <td>{record.isAutomatic == true ? "Y" : "N"}</td>
+                <td>{record.isAutomatic === true ? "Y" : "N"}</td>
               </tr>
           ))}
           </tbody>
