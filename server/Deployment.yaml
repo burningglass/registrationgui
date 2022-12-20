@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: registrationguiserverinit
+  labels:
+    app: registrationguiserverinit
+data:
+  init.sh: |
+    #!/usr/bin/env bash
+    set -euo pipefail
+    openssl version
+
+    echo "[Main]" >> /var/.props/.cfg
+
+    echo -n "SVR_APP_AUTHSERVER_HOST=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_HOST) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_AUTHSERVER_CLIENT_ID=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_CLIENT_ID) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_AUTHSERVER_CLIENT_SECRET=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_CLIENT_SECRET) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_FRONTCHANNEL_LOGIN_PATH_PREFIX=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGIN_PATH_PREFIX) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_FRONTCHANNEL_LOGIN_PATH_SUFFIX=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGIN_PATH_SUFFIX) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_REDIRECT_PATH=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_REDIRECT_PATH) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_REDIRECT_URI=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_REDIRECT_URI) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX) >> /var/.props/.cfg
+
+    echo -n "SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH=" >> /var/.props/.cfg
+    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH) >> /var/.props/.cfg
+
+    #Main container uses /var/.props/.cfg to access its runtime settings
+    #(Optional)app can delete /var/.props/.cfg once it has read all settings
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registrationguiserver
+  namespace: default
+  labels:
+    app: 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registrationguiserver
+  template:
+    metadata:
+      labels:
+        app: registrationguiserver
+    spec:
+      serviceAccountName: initsa
+      initContainers:
+      - name: init
+        image: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+        command: ["/scripts/init.sh"]
+        resources:
+          limits:
+            memory: 64Mi
+          requests:
+            memory: 64Mi
+        volumeMounts:
+        - mountPath: /scripts
+          name: init
+        - mountPath: /var/.props
+          name: props-volume
+        env:
+        - name: PROJECT_ID
+          value: "[PROJECT_ID]"
+      containers:
+      - name: main
+        image: gcr.io/[PROJECT_ID]/registrationguiserver:v1.0.0
+        resources:
+          requests:
+            cpu: 100m
+        tty: true
+        volumeMounts:
+        - mountPath: /var/.props
+          name: props-volume
+        env:
+        - name: SVR_APP_GET_COLOURS_URI
+          value: http://registrationguiserversvc/colours
+        - name: SVR_APP_GET_MODELS_URI
+          value: http://registrationguiserversvc/models
+        - name: SVR_APP_GET_REGISTRATIONS_URI
+          value: http://registrationguiserversvc/registrations
+        - name: SVR_APP_GET_VALIDATIONERRORS_URI
+          value: http://registrationguiserversvc/validationErrors
+        - name: SVR_APP_FRONTENDGUI_LANDING_URI
+          value: http://keycloakURI
+      volumes:
+      - name: init
+        configMap:
+          name: registrationguiserverinit
+          defaultMode: 0744
+      - name: props-volume
+        emptyDir:
+          medium: Memory
+          sizeLimit: 32Mi

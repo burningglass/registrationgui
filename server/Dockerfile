@@ -13,7 +13,7 @@ COPY package*.json .
 # With this .env, the app will load these hard-wired secrets
 # (e.g. useful for Docker Desktop testing)
 #
-COPY .env .
+# COPY .env .
 
 # Install to monitor Express (the WSGI)?
 RUN npm install -g nodemon 
