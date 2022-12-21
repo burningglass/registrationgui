@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 
+const lib = require("../lib");
+
 router.get('/', (req, res) => {
   var logoutRedirectURI =
-    process.env.SVR_APP_AUTHSERVER_HOST +
-    process.env.SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX +
-    process.env.SVR_APP_AUTHSERVER_CLIENT_ID +
-    process.env.SVR_APP_REDIRECT_PATH +
-    process.env.SVR_APP_REDIRECT_URI
+    lib.getConfigValue("SVR_APP_AUTHSERVER_HOST", "", false) +
+    lib.getConfigValue("SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX", "", false) +
+    lib.getConfigValue("SVR_APP_AUTHSERVER_CLIENT_ID", "", false) +
+    lib.getConfigValue("SVR_APP_REDIRECT_PATH", "", false) +
+    lib.getConfigValue("SVR_APP_REDIRECT_URI", "", false)
 
   console.log(logoutRedirectURI);
 

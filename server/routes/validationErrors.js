@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
-const dotenv = require('dotenv').config();
+
+const lib = require("../lib");
 
 router.post('/', async(req, res) => {
   // e.g. POST = REST Query (e.g. to 'http://localhost:5000/validationErrors')
   //  
   try {
-    const url = process.env.SVR_APP_GET_VALIDATIONERRORS_URI;
+    const url = lib.getConfigValue("SVR_APP_GET_VALIDATIONERRORS_URI", "", false);
 
     if ("userName" in req.body && "firstName" in req.body && "lastName" in req.body &&
       "phoneNumber" in req.body && "modelId" in req.body && "colourId" in req.body) {

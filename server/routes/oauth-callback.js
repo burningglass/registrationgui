@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const request = require('request');
-const dotenv = require('dotenv').config();
+
+const lib = require("../lib");
 
 function parseJwt (token) {
     return JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
@@ -16,7 +17,7 @@ router.get('/', (req, res) => {
     req.session.destroy();
 
     // Redirect to client's start page (e.g. 'http://localhost:3000')
-    res.redirect(process.env.SVR_APP_FRONTENDGUI_LANDING_URI);
+    res.redirect(lib.getConfigValue("SVR_APP_FRONTENDGUI_LANDING_URI", "", false));
     return;
   }
 
@@ -30,13 +31,13 @@ router.get('/', (req, res) => {
     // e.g. to 'http://localhost:8180' + '/auth/realms/registrationrealm/protocol/openid-connect/token'
     {
       method: 'POST',
-      uri: process.env.SVR_APP_AUTHSERVER_HOST + process.env.SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH,
+      uri: lib.getConfigValue("SVR_APP_AUTHSERVER_HOST", "", false) + lib.getConfigValue("SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH", "", false),
       form: {
-        'client_id': process.env.SVR_APP_AUTHSERVER_CLIENT_ID,
-        'client_secret': process.env.SVR_APP_AUTHSERVER_CLIENT_SECRET,
+        'client_id': lib.getConfigValue("SVR_APP_AUTHSERVER_CLIENT_ID", "", false),
+        'client_secret': lib.getConfigValue("SVR_APP_AUTHSERVER_CLIENT_SECRET", "", false),
         'code': req.query.code,
         'grant_type': 'authorization_code',
-        'redirect_uri': process.env.SVR_APP_REDIRECT_URI
+        'redirect_uri': lib.getConfigValue("SVR_APP_REDIRECT_URI", "", false)
       }
     },
 
@@ -54,7 +55,7 @@ router.get('/', (req, res) => {
       req.session.token = JSON.parse(body).access_token;
 
       // Redirect to client's start page
-      res.redirect(process.env.SVR_APP_FRONTENDGUI_LANDING_URI);
+      res.redirect(lib.getConfigValue("SVR_APP_FRONTENDGUI_LANDING_URI", "", false));
     }
   );
 });

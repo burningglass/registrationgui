@@ -11,17 +11,19 @@ const validationErrorsRoute = (require('./routes/validationErrors'));
 const express = require('express');
 const cors = require('cors');
 
+const lib = require("./lib");
+
 // Remember to 'npm install dotenv' (one time, at the outset)
 //  (enables process.env.* to be potentially overridden by the .env file)
 const dotenv = require('dotenv').config(); 
 
-const PORT = process.env.SVR_APP_LISTENING_PORT || 3001;
+// Not all runtime settings are retrieved from process.env
+// (some are secrets accessed by lib.js in the local fs)
+const PORT = lib.getConfigValue("SVR_APP_LISTENING_PORT", 3001, true);
 
 // Configure express app and install JSON middleware for parsing JSON bodies
 const app = express();
 app.use(express.json());
-
-console.log(process.env.SVR_APP_LISTENING_PORT);
 
 // Enable http session support
 var session = require('express-session')

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
-const dotenv = require('dotenv').config();
+
+const lib = require("../lib");
 
 router.post('/', async(req, res) => {
   // e.g. POST(with full fields) = REST Insert (e.g. to 'http://localhost:5000/registrations')
@@ -9,7 +10,7 @@ router.post('/', async(req, res) => {
   // (GET not used, so query params not sent in the URL)
   //  
   try {
-    const url = process.env.SVR_APP_GET_REGISTRATIONS_URI;
+    const url = lib.getConfigValue("SVR_APP_GET_REGISTRATIONS_URI", "", false);
 
     if ("userName" in req.body && "firstName" in req.body && "lastName" in req.body &&
       "phoneNumber" in req.body && "modelId" in req.body && "colourId" in req.body &&

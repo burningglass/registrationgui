@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const fetch = require('node-fetch');
-const dotenv = require('dotenv').config();
+
+const lib = require("../lib");
 
 router.get('/', async(req, res) => {
   // e.g. GET = REST Query (e.g. to 'http://localhost:5000/colours')
   //
   try {
-    const url = process.env.SVR_APP_GET_COLOURS_URI;
+    const url = lib.getConfigValue("SVR_APP_GET_COLOURS_URI", "", false);
+    console.log (url);
 
     const options = {
       method: 'GET',
