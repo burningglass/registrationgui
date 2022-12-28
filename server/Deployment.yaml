@@ -10,37 +10,47 @@ data:
     set -euo pipefail
     openssl version
 
-    echo "[Main]" >> /var/.props/.cfg
+    echo "{" >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_AUTHSERVER_HOST=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_HOST) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_AUTHSERVER_HOST\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_HOST) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_AUTHSERVER_CLIENT_ID=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_CLIENT_ID) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_AUTHSERVER_CLIENT_ID\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_CLIENT_ID) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_AUTHSERVER_CLIENT_SECRET=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_CLIENT_SECRET) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_AUTHSERVER_CLIENT_SECRET\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_AUTHSERVER_CLIENT_SECRET) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_FRONTCHANNEL_LOGIN_PATH_PREFIX=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGIN_PATH_PREFIX) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_FRONTCHANNEL_LOGIN_PATH_PREFIX\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGIN_PATH_PREFIX) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_FRONTCHANNEL_LOGIN_PATH_SUFFIX=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGIN_PATH_SUFFIX) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_FRONTCHANNEL_LOGIN_PATH_SUFFIX\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGIN_PATH_SUFFIX) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_REDIRECT_PATH=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_REDIRECT_PATH) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_REDIRECT_PATH\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_REDIRECT_PATH) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_REDIRECT_URI=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_REDIRECT_URI) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_REDIRECT_URI\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_REDIRECT_URI) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_FRONTCHANNEL_LOGOUT_PATH_PREFIX) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    echo -n "SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH=" >> /var/.props/.cfg
-    echo $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH) >> /var/.props/.cfg
+    echo -n "  \"SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH\" : \"" >> /var/.props/.cfg.json
+    echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH) >> /var/.props/.cfg.json
+    echo "\"," >> /var/.props/.cfg.json
 
-    #Main container uses /var/.props/.cfg to access its runtime settings
-    #(Optional)app can delete /var/.props/.cfg once it has read all settings
+    echo "}" >> /var/.props/.cfg.json
+
+    #Main container uses /var/.props/.cfg.json to access its runtime settings
 ---
 apiVersion: apps/v1
 kind: Deployment
