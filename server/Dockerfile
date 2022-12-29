@@ -25,7 +25,7 @@ RUN npm ci --only=production
 # RUN npm install
 
 # Install app source
-COPY index.js ./app/
+COPY index.js lib.js ./app/
 COPY routes/*.js ./app/routes/
 
 EXPOSE 3001

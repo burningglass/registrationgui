@@ -58,7 +58,7 @@ metadata:
   name: registrationguiserver
   namespace: default
   labels:
-    app: 
+    app: registrationguiserver
 spec:
   replicas: 1
   selector:
