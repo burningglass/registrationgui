@@ -46,7 +46,7 @@ data:
 
     echo -n "  \"SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH\" : \"" >> /var/.props/.cfg.json
     echo -n $(gcloud secrets versions access 1 --project=${PROJECT_ID} --secret=SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH) >> /var/.props/.cfg.json
-    echo "\"," >> /var/.props/.cfg.json
+    echo "\"" >> /var/.props/.cfg.json
 
     echo "}" >> /var/.props/.cfg.json
 
@@ -98,14 +98,16 @@ spec:
         - mountPath: /var/.props
           name: props-volume
         env:
+        - name: SVR_APP_LISTENING_PORT
+          value: "3001"
         - name: SVR_APP_GET_COLOURS_URI
-          value: http://registrationguiserversvc/colours
+          value: http://registrationstoresvc:80/colours
         - name: SVR_APP_GET_MODELS_URI
-          value: http://registrationguiserversvc/models
+          value: http://registrationstoresvc:80/models
         - name: SVR_APP_GET_REGISTRATIONS_URI
-          value: http://registrationguiserversvc/registrations
+          value: http://registrationstoresvc:80/registrations
         - name: SVR_APP_GET_VALIDATIONERRORS_URI
-          value: http://registrationguiserversvc/validationErrors
+          value: http://registrationstoresvc:80/validationErrors
         - name: SVR_APP_FRONTENDGUI_LANDING_URI
           value: http://keycloakURI
       volumes:

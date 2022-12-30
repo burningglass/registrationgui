@@ -7,16 +7,13 @@ WORKDIR /usr/local/src
 
 # Package.json*.json specify NPM packages used by app
 # Package-lock.json stipulates specific versions of required packages
-COPY package*.json ./
+COPY package*.json /usr/local/src/
 
 # Remove this line and rebuild image before deploying to K8s
 # With this .env, the app will load these hard-wired secrets
 # (e.g. useful for Docker Desktop testing)
 #
 # COPY .env ./
-
-# Install to monitor Express (the WSGI)?
-RUN npm install -g nodemon 
 
 # Option 1. Install for Production?, i.e. install strictly per package-lock.json, deleting node_modules beforehand
 RUN npm ci --only=production
@@ -25,8 +22,8 @@ RUN npm ci --only=production
 # RUN npm install
 
 # Install app source
-COPY index.js lib.js ./app/
-COPY routes/*.js ./app/routes/
+COPY index.js lib.js /usr/local/src/app/
+COPY routes/*.js /usr/local/src/app/routes/
 
 EXPOSE 3001
 CMD ["node", "app/index.js"]
