@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Registration GUI frontend (React)",
   "scripts": {
-    "start": "react-scripts start"
+    "start": "react-scripts start",
+    "build": "react-scripts build"
   },
   "author": "",
   "license": "ISC",
