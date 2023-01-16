@@ -13,6 +13,9 @@ WORKDIR /usr/local/src
 # Installs openssl to generate platform-specific dhparams.pem & key/cert material
 # (needed by nginx TLS config (Step 2), where these aren't injected by K8s initialisation)
 #
+# If not required, change FROM above to: FROM node:16.17.0-bullseye-slim
+#  (Alpine images not officially supported, so unless apk is required, better to use LTS version of official image)
+#
 RUN apk update \
       && apk add openssl \
       && openssl dhparam -out /usr/local/src/dhparam.pem 2048 \
@@ -47,7 +50,7 @@ RUN npm run build
 
 
 # Step 2. Build and run main app image which starts nginx to serve React app artefacts (built above)
-# (React app runtime artefacts coped from /usr/local/src/build above)
+# (React app runtime artefacts copied from /usr/local/src/build above)
 # https://www.nginx.com/blog/deploying-nginx-nginx-plus-docker/
 #
 FROM nginx
