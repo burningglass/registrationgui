@@ -1,6 +1,5 @@
-# Step 1: Create and run the Express app builder image
+# Create and run the Express app builder image
 # Node.js alpine image include apk to install extra packages
-# (i.e. add openssl to generate files for nginx config in Step 2)
 # https://stackoverflow.com/questions/45857340/docker-nginx-error-openssl-command-not-found
 #
 FROM node:16.17-alpine
@@ -24,7 +23,7 @@ COPY nginx.conf /etc/nginx/
 
 # Comment lines (needed for Docker Desktop testing) and rebuild image before deploying to K8s
 # Installs openssl to generate platform-specific dhparams.pem & key/cert material (copying these to nginx folders)
-# (needed by nginx TLS config (Step 2), where these aren't injected by K8s initialisation)
+# (needed by nginx TLS config, where these aren't injected by K8s initialisation)
 #
 # Also copies dhparams.pem & key/cert material to nginx config folders
 #
