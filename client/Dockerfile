@@ -9,12 +9,20 @@ FROM node:16.17-alpine AS builder
 #
 WORKDIR /usr/local/src
 
-# Comment lines (needed for Docker Desktop testing) and rebuild image before deploying to K8s
-# Installs openssl to generate platform-specific dhparams.pem & key/cert material
-# (needed by nginx TLS config (Step 2), where these aren't injected by K8s initialisation)
-#
-# If not required, change FROM above to: FROM node:16.17.0-bullseye-slim
+# Note. Install of .nginx-selfsigned.key and .nginx-selfsigned.crt below can be removed
+# IF you are:
+# - Deploying to K8s
+# - And need to generate valid Internet certificates
+# - And therefore need to use your own .key and.crt file names
+# In which case, you must store your files as additional Google Secrets
+# and enhance Deployment.yaml to deploy these during container init
+# (note. you will also need to amend nginx.conf before Dockerizing to ref. your filenames)
+# Also if not required, change FROM above to: FROM node:16.17.0-bullseye-slim
 #  (Alpine images not officially supported, so unless apk is required, better to use LTS version of official image)
+#
+# Default RUN uses openssl to generate platform-specific dhparams.pem & *self-signed* key/cert material
+# copying these to nginx folders
+# (needed by nginx TLS config, where these aren't injected by K8s init)
 #
 RUN apk update \
       && apk add openssl \
@@ -29,7 +37,7 @@ COPY package*.json /usr/local/src/
 # Comment line (needed for Docker Desktop testing) and rebuild image before deploying to K8s
 # App will load these hard-wired secret properties from the .env
 #
-COPY .env /usr/local/src/
+# COPY .env /usr/local/src/
 
 # Option 1. Install for Production?, i.e. install strictly per package-lock.json, deleting node_modules beforehand
 #

@@ -21,11 +21,18 @@ RUN mkdir -p /var/.cert
 RUN rm /etc/nginx/nginx.conf
 COPY nginx.conf /etc/nginx/
 
-# Comment lines (needed for Docker Desktop testing) and rebuild image before deploying to K8s
-# Installs openssl to generate platform-specific dhparams.pem & key/cert material (copying these to nginx folders)
-# (needed by nginx TLS config, where these aren't injected by K8s initialisation)
+# Note. Install of .nginx-selfsigned.key and .nginx-selfsigned.crt below can be removed
+# IF you are:
+# - Deploying to K8s
+# - And need to generate valid Internet certificates
+# - And therefore need to use your own .key and.crt file names
+# In which case, you must store your files as additional Google Secrets
+# and enhance Deployment.yaml to deploy these during container init
+# (note. you will also need to amend nginx.conf before Dockerizing to ref. your filenames)
 #
-# Also copies dhparams.pem & key/cert material to nginx config folders
+# Default RUN uses openssl to generate platform-specific dhparams.pem & *self-signed* key/cert material
+# copying these to nginx folders
+# (needed by nginx TLS config, where these aren't injected by K8s init)
 #
 RUN apk update \
       && apk add openssl \
@@ -41,8 +48,8 @@ COPY package*.json /usr/local/src/
 # With this .env and empty (secrets).cfg.json, the app will load hard-wired secrets and config
 # (e.g. useful for Docker Desktop testing)
 #
-COPY .env /usr/local/src/
-COPY .cfg.json /var/.props/
+# COPY .env /usr/local/src/
+# COPY .cfg.json /var/.props/
 
 # Option 1. Install for Production?, i.e. install strictly per package-lock.json, deleting node_modules beforehand
 #
