@@ -11,16 +11,16 @@ router.get('/', (req, res) => {
   //
   if (req.session.token) {
     jwt = parseJwt(req.session.token);
-    console.log(jwt["email"]);
+    console.log(jwt["email"]); // jwt["email"] Or (jwt["family_name"] + ", " + jwt["given_name"]), also sent below
 
     res.send({
-      email: jwt["email"],
+      userName: jwt["email"],
       loggedIn: true
     });
   }
   else {
     res.send({
-      email: 'unknown user',
+      userName: 'unknown user',
       loggedIn: false
     });   
   }

@@ -47,12 +47,12 @@ router.get('/', (req, res) => {
       console.log(body);
 
 	console.log("Access token extracted/decoded:");
-	jwt = parseJwt(JSON.parse(body).access_token);
+	jwt = parseJwt(JSON.parse(body).id_token); // Note. or .access_token
       console.log(jwt);
 
       // Save token to session
       console.log('Token saved to session');
-      req.session.token = JSON.parse(body).access_token;
+      req.session.token = JSON.parse(body).id_token; // Note. or .access_token
 
       // Redirect to client's start page
       res.redirect(lib.getConfigValue("SVR_APP_FRONTENDGUI_LANDING_URI", "", false));

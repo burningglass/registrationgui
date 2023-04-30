@@ -14,7 +14,7 @@ class App extends React.Component {
     
     //Initial state
     this.state = {
-      body: { email: "", loggedIn: false },
+      body: { userName: "", loggedIn: false },
       models: [],
       colours: [],
       errors: [],
@@ -209,7 +209,7 @@ class App extends React.Component {
         </header>
         <div className="p-3">
           <form id="registrationForm" name="registrationForm" onSubmit={this.handleSubmit} noValidate>
-            <input type="hidden" id="userName" name="userName" value={this.state.body.email} readOnly /><br/>
+            <input type="hidden" id="userName" name="userName" value={this.state.body.userName} readOnly /><br/>
 
             <legend>Register Customer's Interest</legend>
 
