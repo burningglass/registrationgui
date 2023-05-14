@@ -1,20 +1,21 @@
 # Registration Sample application (React GUI and Node.js Backend) 
 
-A simple application (demo premise: to capture prospective car buyers' interest in new cars) comprising:
+A simple application (demo premise: to capture prospective buyers' interest in new cars) comprising:
 1. A basic web GUI (technology: React with Javascript) operating in conjunction with
 2. A web backend service (technology: Node.js Express with Javascript)
 
-This application will use KeyCloak to authenticate users so the first part details how to install KeyCloak both locally (when testing the application on a local desktop) and in the Cloud (to support the applications once deployed in GCloud K8s) 
+This application uses KeyCloak to authenticate users so the first part details how to install KeyCloak both locally (when testing the application on a local desktop) and in the Cloud (i.e. hosted by K8s alongside the applications)
 
 ## 1 KeyCloak Local Set-up
 
 KeyCloak is an opensource IAM (Identity and Access Management) platform compliant to OAuth2 and OIDC (Open ID Connect) standards
 
-[KeyCloak](<Link>)
+[KeyCloak](https://www.keycloak.org/getting-started/getting-started-docker)
 
-KeyCloak is available as a standard image from DockerHub for installing under Docker Desktop to support local desktop testing
+KeyCloak is available both as:
 
-- As a Helm Chart which can install KeyCloak as a K8s-hosted service
+- A standard image from Quay.io for Docker Desktop installation to support local desktop testing
+- A Helm Chart which can install KeyCloak as a K8s-hosted service
 
 KeyCloak is a pre-requisite to run/test both the Registration GUI and Backend sample applications which use it to manage secure user login/ authentication
 
@@ -22,8 +23,8 @@ KeyCloak is a pre-requisite to run/test both the Registration GUI and Backend sa
 
 From a Command Prompt:
 
-`docker pull jboss/keycloak:latest`<br/>
-`docker run --rm --name keycloak -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=<defaultpass> -p 8180:8180 -it jboss/keycloak -b 0.0.0.0 -Djboss.http.port=8180`<br/>
+`docker pull quay.io/keycloak/keycloak:21.1.1`<br/>
+`docker run --rm --name keycloak -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=<defaultpass> -p 8180:8180 -it quay.io/keycloak/keycloak -b 0.0.0.0 -Djboss.http.port=8180`<br/>
 
 ### 1.2 Log-in as Administrator (Windows desktop)
 
@@ -35,7 +36,7 @@ Click Administration Console:
 
 ### 1.3 Create a Realm
 
-By hovering over the 'Master' realm:
+Hover over the 'Master' realm, enter Name as `registrationrealm` then click 'Create'
 
 ![Create KeyCloak Realm](README.images/Picture2.png)
 
@@ -45,19 +46,20 @@ Click 'Clients' and 'Create'
 
 Complete the form as follows:
 
-*ClientID*: registrationclient
-*Access Type*: confidential
+| Form Field | Value |
+| --- | ----------- |
+| ClientID | registrationclient |
+| Access Type | confidential |
+| Client Protocol | openid-connect |
+| Valid Redirect URIs | http://localhost:3001/oauth-callback |
+| Backchannel Logout Session Required | OFF |
 
-(Client Protocol should already be 'openid-connect')
-
-*Valid Redirect URIs*: http://localhost:3001/oauth-callback 
-
-(the above path will serve as the Registation App GUI Backend's OAuth-Callback route)
-
-*Backchannel Logout Session Required*: OFF
+Note. KeyCloak will invoke the 'Valid Redirect URI' (i.e. the Registation App GUI Backend's OAuth-Callback route)
 
 *Important.* On the 'Credentials' tab, take note of this OAuth client's 'secret'
-This must appear in the Registration GUI's .env file (the 'clientSecret' environment setting), note: creating the Registration GUI (a React app) is covered in the next section.
+This must appear in the Registration GUI's .env file (the 'clientSecret' environment setting)
+
+Creating the Registration Backend service (which interacts with KeyCloak) is explained section 4 onwards
 
 ### 1.5 Create the test User
 
@@ -67,19 +69,19 @@ Click 'Users' and 'Add user'
 
 Click 'Credentials' and enter the password (twice).
 
-Ensure Temporary is OFF
+Ensure 'Temporary' is OFF
 
 Click 'Set Password'
 
 ## 2 KeyCloak GCloud K8s-hosted Configuration
 
-While the above steps are sufficient to install KeyCloak for local/ desktop testing, an extra configuration is needed manage/host this service in the Cloud
+While the above steps are sufficient to install KeyCloak for local desktop testing, different configuration is needed manage/host a KeyCloak Cloud instance
  
-KeyCloak is additionally available as a Helm Chart by which the platform is hosted and managed by K8s
+KeyCloak is also available as a Helm Chart which can install the service on K8s
 
 ### 2.1 Prepare a Standard Cluster to host KeyCloak in GCP
 
-First create a new Standard cluster (resides alongside the Registration-Cluster) called ‘keycloak-cluster-1’:
+First create a new Standard cluster (will reside alongside 'registration-cluster-1') called ‘keycloak-cluster-1’:
 
 ![Create K8s Cluster Step 1](README.images/Picture4.png)
 
@@ -89,7 +91,7 @@ And finally:
 
 ![Create K8s Cluster Step 3](README.images/Picture6.png)
 
-### 2.2 Install / Start KeyCloak in GCloud K8s (via Helmchart)
+### 2.2 Install / Start KeyCloak in GCloud K8s (using a Helmchart)
 
 Open up GShell in the new (keycloak-cluster-1) cluster’s context:
 
@@ -109,13 +111,13 @@ The IP address of this new running Keycloak is visible under Services:
 
 ![KeyCloak K8s assigned IP addresses](README.images/Picture9.png)
 
-### 2.3 Test and set-up GCloud K8s-hosted Keycloak
+### 2.3 Test/ tune GCloud K8s-hosted Keycloak instance
 
-Use the address https://<IP_ADDRESS_FROM_SERVICES_ABOVE>
+Open a new browser tab at: https://<IP address for 'keycloak' service endpoint above> and on the KeyCloak landing page, click 'Administration Console'
 
 *Important.* Accept the certificate when warned it is not trusted.
 
-Now repeat steps 1.2 – 1.5
+Now repeat steps 1.3 – 1.5
 
 ## 3 Application Repo set-up
 
@@ -145,8 +147,6 @@ On the local Desktop (using the Command Prompt):
 
 `cd %HOMEPATH%\projects\registrationgui`<br/>
 `mkdir server`<br/>
-`cd server`<br/>
-`mkdir routes`<br/>
 
 ## 5 Develop the Backend service
 
@@ -173,17 +173,17 @@ Edit package.json to:
 
 Create the main file called index.js, the complete example is visible in Github:
 
-[Index.js example](https://github.com/burningglass/registrationgui/server/index.js)
+[Index.js example](https://github.com/burningglass/registrationgui/blob/main/server/index.js)
 
 Most important is declaring the imports (at the top of this file):
-Of these, the following scripts (to save within the 'routes' path) will handle user authentication, log-in and log-out:
+Amongst these are references to the following scripts (will reside under the 'routes' path) to handle user authentication, log-in and log-out:
 
 `const userRoute = (require('./routes/user'));`<br/>
 `const loginRoute = (require('./routes/login'));`<br/>
 `const logoutRoute = (require('./routes/logout'));`<br/>
 `const oauthCallbackRoute = (require('./routes/oauth-callback'));`<br/>
 
-These other scripts (to save within 'routes' path) handle data access and validation:
+These other scripts (will also reside under 'routes') handle data access and form field input validation:
 
 `const modelsRoute = (require('./routes/models'));`<br/>
 `const coloursRoute = (require('./routes/colours'));`<br/>
@@ -192,9 +192,11 @@ These other scripts (to save within 'routes' path) handle data access and valida
 
 Express is the major dependency:
 
+[Express](https://expressjs.com/)
+
 `const express = require('express');`
 
-Also because this Backend server-side app may be reached on ports different to the calling React client-side app (both must run side-by-side for local testing) enabling 'CORS' is also necessary:
+Also because this Backend server-side app may be reached on a port different to that of the (React)client-side app (e.g. both will listen for connections side-by-side on a local desktop) enabling 'CORS' is necessary:
 
 `const cors = require('cors');`
 
@@ -204,19 +206,13 @@ Finally enabling 'dotenv' allows environment properties to be read from a local 
 
 ### 5.3 Create the Lib (shared functions) script
 
-Create the routes sub-folder:
-
-`cd %HOMEPATH%\projects\registrationgui\server`<br/>
-`mkdir lib`<br/>
-`cd lib`<br/>
-
 Create the lib.js script - the complete example is available in GitHub:
 
-https://github.com/burningglass/registrationgui/server/lib.js
+[Lib.js](https://github.com/burningglass/registrationgui/blob/main/server/lib.js)
 
-Note. The single shared function in this script enables look-up of runtime properties whilst hiding implementation details of such lookups, i.e. certain properties may be loaded from the environment (non-secret properties) or a local file (secrets)
+Note. The single shared function in this script enables look-up of runtime properties whilst hiding lookup implementation detail, i.e. certain properties may be loaded from the environment (non-secret properties) or a local file (secret properties or 'secrets'), the application merely needs to access each property by name
 
-The local file carrying application secrets is .cfg.json and the script will try to load this from /var/.props
+The local file carrying secrets is .cfg.json and the script will expect to find it in the folder /var/.props
 
 ### 5.4 Implement all 'routes' scripts
 
@@ -228,14 +224,14 @@ Create the routes sub-folder:
 
 Create the following files (note. fully implemented examples are available in this repo for reference):
 
-- colours.js
-- login.js
-- logout.js
-- models.js
-- oauth-callback.js
-- registrations.js
-- user.js
-- validationErrors.js
+[Colours.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/colours.js)<br/>
+[login.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/login.js)<br/>
+[logout.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/logout.js)<br/>
+[models.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/models.js)<br/>
+[oauth-callback.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/oauth-callback.js)<br/>
+[registrations.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/registrations.js)<br/>
+[user.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/user.js)<br/>
+[validationErrors.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/validationErrors.js)
 
 ### 5.5 Create the Backend's environment file (runtime settings)
 
