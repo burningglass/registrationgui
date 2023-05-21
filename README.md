@@ -210,9 +210,9 @@ Create the lib.js script - the complete example is available in GitHub:
 
 [Lib.js](https://github.com/burningglass/registrationgui/blob/main/server/lib.js)
 
-Note. The single shared function in this script enables look-up of runtime properties whilst hiding lookup implementation detail, i.e. certain properties may be loaded from the environment (non-secret properties) or a local file (secret properties or 'secrets'), the application merely needs to access each property by name
+Note. The single shared function in this script enables look-up of runtime properties, but hides implementation details, i.e. certain properties may be loaded from the environment (non-secret properties) or a local file (secret properties or 'secrets'), the application just needs to access properties by name regardless of how they are loaded
 
-The local file carrying secrets is .cfg.json and the script will expect to find it in the folder /var/.props
+The local file carrying secrets is .cfg.json and Lib.js expects to find it in the local folder /var/.props
 
 ### 5.4 Implement all 'routes' scripts
 
@@ -224,7 +224,7 @@ Create the routes sub-folder:
 
 Create the following files (note. fully implemented examples are available in this repo for reference):
 
-[Colours.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/colours.js)<br/>
+[colours.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/colours.js)<br/>
 [login.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/login.js)<br/>
 [logout.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/logout.js)<br/>
 [models.js](https://github.com/burningglass/registrationgui/blob/main/server/routes/models.js)<br/>
@@ -238,7 +238,7 @@ Create the following files (note. fully implemented examples are available in th
 Under `%HOMEPATH%\projects\registrationgui\server`
 Create a text file called `.env`
 
-Contents should be as follows:
+Content should be as follows:
 
 ```
 SVR_APP_LISTENING_PORT=3001
@@ -272,7 +272,7 @@ SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH=/auth/realms/registrationrealm/protocol/o
 `npm install request`<br/>
 `npm install crypto`<br/>
 `npm install dotenv`<br/>
-`npm install node-fetch@2` (...when using ESM3, else simply install node-fetch)<br/>
+`npm install node-fetch@2` (...when using ESM3 (ECMA Script Modules v3), else simply install node-fetch)<br/>
 `npm install cors`<br/>
 `npm install express-session`
 
@@ -307,8 +307,9 @@ SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH=/auth/realms/registrationrealm/protocol/o
 `cd client`<br/>
 `code .` (will launch VS Code in the specific project folder)
 
-Using VS Code's Terminal, create a package.json file:
- npm init
+Using VS Code's Terminal, create a package.json file::
+
+`npm init`
 
 ![Initializing Node.js config](README.images/Picture14.png)
 
@@ -339,6 +340,8 @@ Create the routes sub-folder:
 `mkdir components`<br/>
 `cd components` and create the file (Greeting.js) here
 
+Note. the complete example is visible in Github:
+
 [Greeting.js example](https://github.com/burningglass/registrationgui/blob/main/client/src/components/Greeting.js)
 
 ### 6.4 Create the Front-end's environment file (runtime settings)
@@ -346,7 +349,7 @@ Create the routes sub-folder:
 `cd %HOMEPATH%\projects\registrationgui\client`<br/>
 `edit .env`<br/>
 
-Contents of the new .env file is as follows:
+Content should be as follows:
 
 ```
 REACT_APP_LOGIN_URI=http://localhost:3001/login
@@ -363,10 +366,10 @@ REACT_APP_REGISTRATION_OPS_URI=http://localhost:3001/registrations
 ### 6.5 Install all Node.js packages
 
 `cd %HOMEPATH%\projects\registrationgui\client`<br/>
-`npm install react react-dom`<br/>
-`npm install react-scripts`<br/>
-`npm install web-vitals@2.1.4`<br/>
-`npm install bootstrap@v5.2.2`<br/>
+`npm install react react-dom` (DOM and server renderers used by React)<br/>
+`npm install react-scripts` (scripts converting React JSX to plain JS at runtime)<br/>
+`npm install web-vitals@2.1.4` (generates user experience stats at React runtime)<br/>
+`npm install bootstrap@v5.2.2` (Special JS and CSS scripts to enhance UI quality/experience)<br/>
 
 ### 6.6 Complete package.json
 
@@ -434,7 +437,7 @@ Create a new file called index.html with the following content:
     <title>Car Interest Registration</title>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>You need to enable JavaScript to run this app</noscript>
     <div id="root"></div>
   </body>
 </html>
@@ -489,7 +492,7 @@ Create a new file called App.css with the following content:
 
 ### 7.4 Clone the Repo (from GitHub):
 
-`git clone <paste>` (i.e. URL copied to clipboard in 1.2)
+`git clone <paste>` (i.e. URL copied to clipboard in 3.2)
 
 ### 7.5 Temporarily amend Dockerfiles
 
@@ -503,7 +506,7 @@ Edit the first Dockerfile and uncomment the two relevant COPY lines:
 
 cd ~/projects/registrationgui/client`
 
-Edit the second Dockerfile and uncomment the two relevant COPY lines:
+Edit the second Dockerfile and uncomment the relevant COPY line:
 
 ![Temporarily embedding secrets - for Backend local testing](README.images/Picture16.png)
 
@@ -513,32 +516,25 @@ Edit the second Dockerfile and uncomment the two relevant COPY lines:
 
 ### 7.7 Build the Docker images:
 
-To retrieve the PROJECT_ID:
-
-`gcloud projects list`
-
-Issue these command (replacing [PROJECT_ID] first):
+`gcloud projects list` yields PROJECT_ID
 
 `cd ~/projects/registrationgui/server`<br/>
-`docker build -t gcr.io/[PROJECT_ID]/registrationguiserver:v1.0.0 .`<br/>
-
-To build the images using their respective Dockerfiles:
+`docker build -t gcr.io/[PROJECT_ID]/registrationguiserver:v1.0.0 .` builds the server (Backend) container image (remember to replace [PROJECT_ID] with the specific PROJECT_ID listed by the previous command)<br/>
 
 `cd ~/projects/registrationgui/client`<br/>
-`docker build -t gcr.io/[PROJECT_ID]/registrationguiclient:v1.0.0 .`<br/>
+`docker build -t gcr.io/[PROJECT_ID]/registrationguiclient:v1.0.0 .` builds the client (Frontend) container image (again remember to replace [PROJECT_ID] with the specific PROJECT_ID)<br/>
 
 Note. complete Dockerfiles are available here:
 
 [Backend Dockerfile](https://github.com/burningglass/registrationgui/blob/main/server/Dockerfile)
 
-[Frontend Dockerfile]
-(https://github.com/burningglass/registrationgui/blob/main/client/Dockerfile)
+[Frontend Dockerfile](https://github.com/burningglass/registrationgui/blob/main/client/Dockerfile)
 
 ### 7.8 Check the local (Docker) Registry
 
-`docker image ls` reveals the newly-built images (above) showing their respective <image ids>
+`docker image ls` reveals the newly-built images (above) showing their respective \<image ids\>
 
-### 7.9 Start and verify service in GCloud Shell
+### 7.9 Start and verify services in GCloud Shell
 
 The following commands create containers named "registrationguiservercontainer" and "registrationguiclientcontainer" and starts them:
 
@@ -560,15 +556,19 @@ The following should reveal the containers listening outwardly on ports 8881 and
 `netstat -a | grep 8881`<br/>
 `netstat -a | grep 8882`
 
-Traffic to each port will be routed inwardly to Nginx instances (nginx will be listening on port 443 inside the container)  
+Traffic to each port will be routed inwardly to Nginx instances (nginx will be listening on port 443 inside each container)  
 
 ### 7.10 Terminal into each container
 
-The following works against each container because they were started with the -i switch:
+The following opens an terminal to each container:
 
-`docker exec -it <container name> /bin/bash`
+docker exec -it <container name> /bin/bash
 
-Note. `-i -t` in the `docker run` above allocated a pseudo-TTY connected to the container’s stdin (pseudo-TTY: a device that has the functions of a physical terminal without actually being one; created by terminal emulators such as xterm)
+...because the docker containers were started with the -i switch
+
+Note. -it (docker run switch) allocates a pseudo-TTY connected to a container’s stdin
+
+pseudo-TTY: A device with functions of a physical terminal without actually being one. Created by terminal emulators sucas xterm
 
 Now whilst inside the container filesystem:
 
@@ -577,65 +577,67 @@ Now whilst inside the container filesystem:
 - e.g. [in the server container] `/usr/local/src` contains the Node.js Express app scripts
 - e.g. [in the client container] `/usr/share/nginx/html` contains the static/minified React app scripts
 
-`exit` to exit out of the containers
+`exit` to exit out of each container
 
 ### 7.11 Testing
 
-It is not possible within the GShell to test the above, because both container images embedded self-signed certificates (which beaches GCloud security policy)
+It is difficult to run/test the services together in GShell, because both container images comprise self-signed certificates (breaching GCloud security policy)
 
 However it is possible to repeat step 7.3 to 7.9 on a Windows desktop with Docker installed
 
-Then the above can be tested in a browser, e.g. requesting `https://<localhost>:8881/colours` will execute code in registrationguiserver, which will in turn execute registrationstore (which incidentally should already be started locally too) to access all available vehicle colours on offer
+Then the above containers are testable locally using a browser, e.g. requesting `https://<localhost>:8881/colours` will execute code in registrationguiserver, which will in turn execute registrationstore (it should already be started locally too) to access all available vehicle colours on offer
 
 ### 7.12 Clean up
 
-Not strictly necessary because the GCloud Shell will clean up the workspace, but for learning purposes:
+`docker container stop <container name>` for each container
 
-The following list all docker containers (both started and stopped), the two containers in this example shold carry status "Exited"
+Having issued the above for each container, ensure the statuses show 'Exited':
 
-`docker container stop <container name>`<br/>
 `docker container ls -a`
 
-Assuming so, remove them and their respective images:
+Assuming so, delete each container:
 
-`docker container rm <container name>` to delete each container<br/>
-`docker image rm <image id>` to delete each image<br/>
+`docker container rm <container name>` (for each container)
 
-### 7.13 Prepare built images for Kubernetes deployment
+Images can now also be deleted (as follows):
 
-Important: Images pushed to Google Container Registry and loaded by K8s must not contain secrets
+`docker image rm <image id>` (for each image)
+
+### 7.13 Prepare for Kubernetes deployment
+
+Important: Images pushed to Google Container Registry and loaded by K8s **must NOT** contain secrets
 
 Each image must therefore be adjusted and rebuilt:
 
 `cd ~/projects/registrationgui/server`<br/>
 
-Edit `Dockerfile` and uncomment the two relevant COPY lines:
+Edit `Dockerfile` and **comment** the two relevant COPY lines:
 
 ![Finalizing Frontend for K8s deployment](README.images/Picture17.png)
 
 `cd ~/projects/registrationgui/client`<br/>
 
-Now edit this `Dockerfile` and uncomment the relevant COPY line:
+Now edit this `Dockerfile` and **comment** the relevant COPY line:
 
 ![Finalizing Backend for K8s deployment](README.images/Picture18.png)
 
 ### 7.14 Rebuild the images
 
-To retrieve the PROJECT_ID:
+To retrieve the PROJECT_ID: `gcloud projects list`
 
-`gcloud projects list`
-
-Issue these command (replacing [PROJECT_ID] first) to rebuild the images (no longer carrying secrets):
+Issue these commands to rebuild the images (so they no longer carry secrets):
 
 `cd ~/projects/registrationgui/server`<br/>
-`docker build -t gcr.io/[PROJECT_ID]/registrationguiserver:v1.0.0 .`
+`docker build -t gcr.io/[PROJECT_ID]/registrationguiserver:v1.0.0 .` (remember to replace [PROJECT_ID] with the specific PROJECT_ID listed by the previous command)
 
 `cd ~/projects/registrationgui/client`
-`docker build -t gcr.io/[PROJECT_ID]/registrationguiclient:v1.0.0 .`
+`docker build -t gcr.io/[PROJECT_ID]/registrationguiclient:v1.0.0 .` (again remember to replace [PROJECT_ID])
 
 ### 7.15 Push the Docker images to the Google Container Repository
 
 Again replace [PROJECT_ID] (see previous step):
+
+First retrieve the PROJECT_ID:
 
 `docker push gcr.io/[PROJECT_ID]/registrationguiserver:v1.0.0`<br/>
 `docker push gcr.io/[PROJECT_ID]/registrationguiclient:v1.0.0`
@@ -646,15 +648,17 @@ Again replace [PROJECT_ID] (see previous step):
 
 If not already enabled, find this service under Security and 'Enable' it to reach this dialog:
 
-![Accessing Secret Manager](README.images/Picture12.png)
+![Accessing Secret Manager](README.images/Picture19.png)
 
-### 8.2 Create all Secrets (and establish all IAM Policy Bindings)
+### 8.2 Create all Secrets (and establish IAM Policy Bindings)
 
-In GCloud Shell create and run the following script (remembering to replace [PROJECT_ID] with the actual GCP Project ID where it is initially set, i.e. SET PROJECT_ID):
+To retrieve the PROJECT_ID: `gcloud projects list`
+
+Create the following script in GCloud Shell (remembering to replace [PROJECT_ID]):
 
 [Secrets setup script](https://github.com/burningglass/registrationgui/blob/main/server/grantSecretsAccessToServiceAccount.sh)
 
-Refreshing Secret Manager should now reveal all the secrets now established, i.e.:
+Refreshing Secret Manager should reveal all secrets now established:
 `SVR_APP_AUTHSERVER_HOST`<br/>
 `SVR_APP_AUTHSERVER_CLIENT_ID`<br/>
 `SVR_APP_AUTHSERVER_CLIENT_SECRET`<br/>
@@ -667,27 +671,27 @@ Refreshing Secret Manager should now reveal all the secrets now established, i.e
 
 ### 8.3 Modify secrets to reference K8s-hosted KeyCloak
 
-The `grantSecretsAccessToServiceAccount.sh` script sets some ‘http’ and ‘localhost’ default values which require amendment so the RegistrationGUI Frontend and Backend can each reference the KeyCloak instance hosted in K8s (see section 2.2)
+The `grantSecretsAccessToServiceAccount.sh` script sets some ‘http’ and ‘localhost’ default values which require amendment so RegistrationGUI Frontend and Backend can each reference the KeyCloak instance hosted in K8s (see section 2.2)
 
 Change these values in GCloud's Secret Manager as follows:
 
 From:
-`SVR_APP_AUTHSERVER_HOST= http://localhost:8180`<br/>
+`SVR_APP_AUTHSERVER_HOST=http://localhost:8180`<br/>
 
 To: 
 `SVR_APP_AUTHSERVER_HOST=https://<keyCloakListeningIpAddress>`
 
 From:
-`SVR_APP_AUTHSERVER_CLIENT_SECRET= oidcsecret`<br/>
+`SVR_APP_AUTHSERVER_CLIENT_SECRET=oidcsecret`<br/>
 
 To: 
-`SVR_APP_AUTHSERVER_CLIENT_SECRET=<SecretSpecifiedDuringKeyAdminSetup>`
+`SVR_APP_AUTHSERVER_CLIENT_SECRET=<SecretSpecifiedDuringKeyCloakAdminSetup>`
 
 From:
 `SVR_APP_REDIRECT_URI=http://localhost:3001/oauth-callback`<br/>
 
 To: 
-`SVR_APP_REDIRECT_URI=https://<registrationguiserverSvcIpAddress – see below>/oauth-callback`
+`SVR_APP_REDIRECT_URI=https://<registrationguiserverSvcIpAddress – from section 9.12 below>/oauth-callback`
 
 ## 9 Deploy Registrationgui Frontend and Backend to K8s (in GCloud)
 
@@ -703,9 +707,9 @@ To:
 
 ### 9.3 Create the Backend 'Deployment' configuration (as .yaml)
 
-Create this new file in the registrationgui project’s ‘server’ sub-folder
+Back in the desktop environment, create a file called Deployment.yaml in the registrationgui/server project folder
 
-The complete example is available in Github:
+The complete example available in Github:
 
 [Backend Deployment.yaml](https://github.com/burningglass/registrationgui/blob/main/server/Deployment.yaml
 
@@ -713,29 +717,27 @@ As with the registrationstore service, this Deployment will invoke an init conta
 
 `/var/.props/.cfg`<br/>
 
-This .cfg will carry relevant secrets (established in section 8)
+This .cfg carries the runtime secrets (established in section 8)
 
-The second part of the Deployment.yaml describes the main application container which launches the registrationstoreguiserver Node.js Express app (from its Docker image in Google Container Registry)
+The second part of the Deployment invokes the main application container, i.e. the Node.js Express (Backend) app is launched from its image (in Google Container Registry)
 
 ### 9.3 Create the Frontend 'Deployment' configuration (as .yaml)
 
-Create this new file in the registrationgui project’s ‘client’ sub-folder
+Also in the desktop environment, create a file called Deployment.yaml in the registrationgui/client project folder
 
-The complete example is available in Github:
+The complete example available in Github:
 
 [Frontend Deployment.yaml](https://github.com/burningglass/registrationgui/blob/main/client/Deployment.yaml)
 
-As with other services, this Deployment will invoke an init container at startup to create a run-time settings file in the following memory-mounted folder (inside the Pod):
+This service also carries init container logic (see above) to create its runtime secret settings file:
 
 `/var/.props/.cfg`<br/>
 
-This .cfg will carry relevant secrets (established in section 8)
+The second part of the Deployment.yaml describes the main application container, i.e. the Node.js React (Frontend) app is launched from its Docker image (in Google Container Registry)
 
-The second part of the Deployment.yaml describes the main application container which launches the registrationstoreguiclient Node.js React app (from its Docker image in Google Container Registry)
+### 9.4 Create the Backend 'Service' configuration (as .yaml)
 
-### 9.4 Create the 'Service' configuration as .yaml
-
-Add the following new Service.yaml to the 'server' subfolder in the registrationgui project:
+Also in the desktop environment, create a file called Service.yaml in the registrationgui/server project folder
 
 ```
 apiVersion: v1
@@ -752,7 +754,13 @@ spec:
   type: LoadBalancer
 ```
 
-Add the following new Service.yaml to the 'client' subfolder in the registrationgui project:
+The complete example available in Github:
+
+[Backend Service.yaml](https://github.com/burningglass/registrationgui/blob/main/server/Service.yaml
+
+### 9.5 Create the Frontend 'Service' configuration (as .yaml)
+
+Also in the desktop environment, create a file called Service.yaml in the registrationgui/client project folder
 
 ```
 apiVersion: v1
@@ -769,35 +777,39 @@ spec:
   type: LoadBalancer
 ```
 
-### 9.5 Commit and Push the new files to GitHub
+The complete example available in Github:
 
-`cd ~/projects/registrationgui/server`<br/>
+[Frontend Service.yaml](https://github.com/burningglass/registrationgui/blob/main/client/Service.yaml
+
+### 9.6 Commit and Push the new files to GitHub
+
+`cd %HOMEPATH%`\projects\registrationgui\server</br>
 `git add Deployment.yaml`<br/>
 `git add Service.yaml`<br/>
 
-`cd ~/projects/registrationgui/client`<br/>
+`cd %HOMEPATH%`\projects\registrationgui\client</br>
 `git add Deployment.yaml`<br/>
 `git add Service.yaml`<br/>
 
-`git commit -m “K8S installation/config artefacts”`<br/>
+`git commit -m “K8S installation/config artifacts”`<br/>
 `git push`
 
-### 9.6 Git Pull the two files (above) into local GShell ~/projects/registrationgui folder
+### 9.7 Git Pull the above yaml files in GShell
 
 `cd ~/projects/registrationgui`<br/>
 `git pull`
 
-### 9.10 Modify both Deployment.yamls and replace PROJECT_ID placeholders
+### 9.8 Modify both Deployment.yamls and replace PROJECT_ID placeholders
 
-To retrieve the PROJECT_ID:
+`gcloud projects list` retrieves the PROJECT_ID
 
-`gcloud projects list`
+Now amend the files
 
 `cd ~/projects/registrationgui/server`<br/>
 `nano Deployment.yaml`<br/>
 
-Replace the value “PROJECT_ID” under `env: -name: PROJECT_ID`<br/>
-Replace the value “PROJECT_ID” within the image reference: `image: gcr.io/PROJECT_ID/registrationguiserver:v1.0.0`
+Replace the value 'PROJECT_ID' under `env: -name: PROJECT_ID`<br/>
+Replace the value 'PROJECT_ID' within the image reference: `image: gcr.io/PROJECT_ID/registrationguiserver:v1.0.0`
 
 `cd ~/projects/registrationgui/client`<br/>
 `nano Deployment.yaml`<br/>
@@ -805,7 +817,7 @@ Replace the value “PROJECT_ID” within the image reference: `image: gcr.io/PR
 Replace the value “PROJECT_ID” under `env: -name: PROJECT_ID`<br/>
 Replace the value “PROJECT_ID” within the image reference: `image: gcr.io/PROJECT_ID/registrationguiclient:v1.0.0`
 
-### 9.11 Install Deployment.yaml into K8s (in GCloud):
+### 9.10 Install Deployment.yamls to K8s (in GCloud):
 
 `cd ~/projects/registrationgui/server`<br/>
 `kubectl apply -f Deployment.yaml -n default`<br/>
@@ -819,7 +831,7 @@ Note. `-n` specifies the K8s namespace (it's optional)
 
 Each Deployment will create a single Pod instance (initially in 'ContainerCreating' state and eventually hit 'Running' state)
 
-### 9.12 Install Service.yamls into K8s (in GCloud)
+### 9.12 Install Service.yamls to K8s (in GCloud)
 
 `cd ~/projects/registrationgui/server`<br/>
 `kubectl apply -f Service.yaml -n default`<br/>
