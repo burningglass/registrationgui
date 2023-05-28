@@ -21,7 +21,7 @@ KeyCloak is a pre-requisite to run/test both the Registration GUI and Backend sa
 
 ### 1.1 Install / Start KeyCloak locally (Windows desktop)
 
-From a Command Prompt:
+Using the Command Prompt:
 
 `docker pull quay.io/keycloak/keycloak:21.1.1`<br/>
 `docker run --rm --name keycloak -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=<defaultpass> -p 8180:8180 -it quay.io/keycloak/keycloak -b 0.0.0.0 -Djboss.http.port=8180`<br/>
@@ -56,7 +56,7 @@ Complete the form as follows:
 
 Note. KeyCloak will invoke the 'Valid Redirect URI' (i.e. the Registation App GUI Backend's OAuth-Callback route)
 
-*Important.* On the 'Credentials' tab, take note of this OAuth client's 'secret'
+**Important** On the 'Credentials' tab, take note of this OAuth client's 'secret'
 This must appear in the Registration GUI's .env file (the 'clientSecret' environment setting)
 
 Creating the Registration Backend service (which interacts with KeyCloak) is explained section 4 onwards
@@ -75,11 +75,11 @@ Click 'Set Password'
 
 ## 2 KeyCloak GCloud K8s-hosted Configuration
 
-While the above steps are sufficient to install KeyCloak for local desktop testing, different configuration is needed manage/host a KeyCloak Cloud instance
+While the above steps are sufficient to install KeyCloak for local desktop testing, different configuration is needed to host a KeyCloak Cloud instance
  
-KeyCloak is also available as a Helm Chart which can install the service on K8s
+i.e. KeyCloak is also available as a Helm Chart which can install the service to K8s
 
-### 2.1 Prepare a Standard Cluster to host KeyCloak in GCP
+### 2.1 Prepare a Standard Cluster to host KeyCloak in GCloud
 
 First create a new Standard cluster (will reside alongside 'registration-cluster-1') called ‘keycloak-cluster-1’:
 
@@ -93,11 +93,11 @@ And finally:
 
 ### 2.2 Install / Start KeyCloak in GCloud K8s (using a Helmchart)
 
-Open up GShell in the new (keycloak-cluster-1) cluster’s context:
+Open up GCloud Shell in the new (keycloak-cluster-1) cluster’s context:
 
 ![Connect to K8s](README.images/Picture7.png)
 
-In Cloud Shell:
+In GCloud Shell:
 
 `helm repo add bitnami-repo https://charts.bitnami.com/bitnami`<br/>
 `helm repo list` reveals the bitnami-repo is now known to Helm<br/>
@@ -115,7 +115,7 @@ The IP address of this new running Keycloak is visible under Services:
 
 Open a new browser tab at: https://<IP address for 'keycloak' service endpoint above> and on the KeyCloak landing page, click 'Administration Console'
 
-*Important.* Accept the certificate when warned it is not trusted.
+**Important** Accept the certificate when warned it is not trusted.
 
 Now repeat steps 1.3 – 1.5
 
@@ -123,7 +123,7 @@ Now repeat steps 1.3 – 1.5
 
 ### 3.1 Create an empty Repo (in GitHub)
 
-Your repo can be Public or Private:
+This can be Private or Public:
 
 ![Repo set-up](README.images/Picture10.png)
 
@@ -133,7 +133,7 @@ Your repo can be Public or Private:
 
 ### 3.3 Create the parent working folder
 
-On the local Desktop (using the Command Prompt):
+On the local desktop (using the Command Prompt):
 
 `cd %HOMEPATH%`</br>
 `mkdir projects`</br>
@@ -153,7 +153,7 @@ On the local Desktop (using the Command Prompt):
 ### 5.1 Initialize Node.js configuration
 
 `cd %HOMEPATH%\projects\registrationgui\server`<br/>
-`code .` (will launch VS Code in the specific project folder)<br/>
+`code .` (will launch VS Code in this specific project folder)<br/>
 
 Using VS Code's Terminal, create a package.json file:
 
@@ -171,19 +171,19 @@ Edit package.json to:
 
 ### 5.2 Initial code and dependencies
 
-Create the main file called index.js, the complete example is visible in Github:
+Create the main file called index.js, the complete example is available in Github:
 
 [Index.js example](https://github.com/burningglass/registrationgui/blob/main/server/index.js)
 
 Most important is declaring the imports (at the top of this file):
-Amongst these are references to the following scripts (will reside under the 'routes' path) to handle user authentication, log-in and log-out:
+Amongst these are references to the following scripts (which must reside under the 'routes' path) to handle user authentication, log-in and log-out:
 
 `const userRoute = (require('./routes/user'));`<br/>
 `const loginRoute = (require('./routes/login'));`<br/>
 `const logoutRoute = (require('./routes/logout'));`<br/>
 `const oauthCallbackRoute = (require('./routes/oauth-callback'));`<br/>
 
-These other scripts (will also reside under 'routes') handle data access and form field input validation:
+Some other scripts (also to reside under 'routes') handle data access and form field input validation:
 
 `const modelsRoute = (require('./routes/models'));`<br/>
 `const coloursRoute = (require('./routes/colours'));`<br/>
@@ -196,7 +196,7 @@ Express is the major dependency:
 
 `const express = require('express');`
 
-Also because this Backend server-side app may be reached on a port different to that of the (React)client-side app (e.g. both will listen for connections side-by-side on a local desktop) enabling 'CORS' is necessary:
+Also because this Backend server-side app may be reached on a port different to that of the (React)client-side app (e.g. both must listen for connections side-by-side when on a local desktop/ localhost) enabling 'CORS' is necessary:
 
 `const cors = require('cors');`
 
@@ -305,7 +305,7 @@ SVR_APP_BACKCHANNEL_TOKEN_REQUEST_PATH=/auth/realms/registrationrealm/protocol/o
 `cd %HOMEPATH%\projects\registrationgui`<br/>
 `mkdir client`<br/>
 `cd client`<br/>
-`code .` (will launch VS Code in the specific project folder)
+`code .` (will launch VS Code in this specific project folder)
 
 Using VS Code's Terminal, create a package.json file::
 
@@ -328,7 +328,7 @@ Create the main file called index.js:
 `mkdir src`<br/>
 `cd src` and create the file (index.js) here
 
-Note. the complete example is visible in Github:
+Note. the complete example is available in Github:
 
 [Index.js example](https://github.com/burningglass/registrationgui/blob/main/client/src/index.js)
 
@@ -340,7 +340,7 @@ Create the routes sub-folder:
 `mkdir components`<br/>
 `cd components` and create the file (Greeting.js) here
 
-Note. the complete example is visible in Github:
+Note. the complete example is available in Github:
 
 [Greeting.js example](https://github.com/burningglass/registrationgui/blob/main/client/src/components/Greeting.js)
 
@@ -377,43 +377,7 @@ Add 'eslintConfig' and 'browserslist' sections
 
 The complete file should resemble:
 
-```
-{
-  "name": "registrationguiclient",
-  "version": "1.0.0",
-  "description": "Registration GUI frontend (React)",
-  "main": "index.js",
-  "scripts": {
-    "start": "react-scripts start"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "bootstrap": "^5.2.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "^5.0.1",
-    "web-vitals": "^2.1.4"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
-}
-```
+[package.json](https://github.com/burningglass/registrationgui/blob/main/client/package.json)
 
 ### 6.7 Create the default index.html (for app launch purposes)
 
@@ -432,7 +396,7 @@ Create a new file called index.html with the following content:
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Car Interest Registration (for registering customer interest in new cars)"
+      content="Car Interest Registration (register customer interest in new cars)"
     />
     <title>Car Interest Registration</title>
   </head>
@@ -474,17 +438,17 @@ Create a new file called App.css with the following content:
 
 ## 7 Dockerize the Frontend and Backend (in GCloud)
 
-### 7.1 Connect to K8s context in GCloud:
+### 7.1 Connect to K8s context in GCloud
 
 ![Connecting to K8s context](https://github.com/burningglass/registrationservicemeshsetup/blob/main/README.images/Picture1.png)
 
-### 7.2 Connect to the K8s cluster:
+### 7.2 Connect to the K8s cluster
 
 ![Connecting to the K8s cluster](https://github.com/burningglass/registrationservicemeshsetup/blob/main/README.images/Picture2.png)
 
 ![Connecting to the K8s cluster](https://github.com/burningglass/registrationservicemeshsetup/blob/main/README.images/Picture3.png)
 
-### 7.3 Create the parent working folder (GCloud Shell environment):
+### 7.3 Create the parent working folder (using GCloud Shell):
 
 `cd ~`<br/>
 `mkdir projects`<br/>
@@ -494,9 +458,15 @@ Create a new file called App.css with the following content:
 
 `git clone <paste>` (i.e. URL copied to clipboard in 3.2)
 
-### 7.5 Temporarily amend Dockerfiles
+### 7.5 Create and temporarily amend Dockerfiles
 
-To copy secrets into images (for initial local GCloud testing)
+Create the Dockerfiles if necessary, based on these:
+
+[Backend Dockerfile](https://github.com/burningglass/registrationgui/blob/main/server/Dockerfile)
+
+[Frontend Dockerfile](https://github.com/burningglass/registrationgui/blob/main/client/Dockerfile)
+
+To copy secrets into images (**Important** this is **ONLY** for initial local GCloud testing)
  
 `cd ~/projects/registrationgui/server`
 
@@ -524,12 +494,6 @@ Edit the second Dockerfile and uncomment the relevant COPY line:
 `cd ~/projects/registrationgui/client`<br/>
 `docker build -t gcr.io/[PROJECT_ID]/registrationguiclient:v1.0.0 .` builds the client (Frontend) container image (again remember to replace [PROJECT_ID] with the specific PROJECT_ID)<br/>
 
-Note. complete Dockerfiles are available here:
-
-[Backend Dockerfile](https://github.com/burningglass/registrationgui/blob/main/server/Dockerfile)
-
-[Frontend Dockerfile](https://github.com/burningglass/registrationgui/blob/main/client/Dockerfile)
-
 ### 7.8 Check the local (Docker) Registry
 
 `docker image ls` reveals the newly-built images (above) showing their respective \<image ids\>
@@ -539,7 +503,7 @@ Note. complete Dockerfiles are available here:
 The following commands create containers named "registrationguiservercontainer" and "registrationguiclientcontainer" and starts them:
 
 `docker run -d -i -t -p:8881:443 --name registrationguiservercontainer <image id>`<br/>
-`docker run -d -i -t -p:8882:443 --name registrationguiclientcontainer <image id>`<br/>
+`docker run -d -i -t -p:8882:443 --name registrationguiclientcontainer <image id>`
 
 Check the containers are running:
 
@@ -556,23 +520,23 @@ The following should reveal the containers listening outwardly on ports 8881 and
 `netstat -a | grep 8881`<br/>
 `netstat -a | grep 8882`
 
-Traffic to each port will be routed inwardly to Nginx instances (nginx will be listening on port 443 inside each container)  
+Traffic to each port will be routed inwardly to Nginx instances (nginx will listen on port 443 inside each container)  
 
 ### 7.10 Terminal into each container
 
 The following opens an terminal to each container:
 
-docker exec -it <container name> /bin/bash
+`docker exec -it <container name> /bin/bash`
 
 ...because the docker containers were started with the -i switch
 
-Note. -it (docker run switch) allocates a pseudo-TTY connected to a container’s stdin
+Note. `-it` (docker run switch) allocates a pseudo-TTY connected to a container’s stdin
 
 pseudo-TTY: A device with functions of a physical terminal without actually being one. Created by terminal emulators sucas xterm
 
-Now whilst inside the container filesystem:
+Now inside a container's filesystem:
 
-`ls`<br/> should list the primary folders:
+`ls` should list the primary folders:
 - e.g. `/etc/nginx` comprises the embedded Nginx web server binaries and configs
 - e.g. [in the server container] `/usr/local/src` contains the Node.js Express app scripts
 - e.g. [in the client container] `/usr/share/nginx/html` contains the static/minified React app scripts
@@ -581,7 +545,7 @@ Now whilst inside the container filesystem:
 
 ### 7.11 Testing
 
-It is difficult to run/test the services together in GShell, because both container images comprise self-signed certificates (breaching GCloud security policy)
+It is difficult to run/test the services together in GClould Shell, because both container images comprise self-signed certificates (breaching GCloud security policy)
 
 However it is possible to repeat step 7.3 to 7.9 on a Windows desktop with Docker installed
 
@@ -605,7 +569,7 @@ Images can now also be deleted (as follows):
 
 ### 7.13 Prepare for Kubernetes deployment
 
-Important: Images pushed to Google Container Registry and loaded by K8s **must NOT** contain secrets
+**Important** Images pushed to Google Container Registry and loaded by K8s **must NOT** contain secrets
 
 Each image must therefore be adjusted and rebuilt:
 
@@ -658,7 +622,7 @@ Create the following script in GCloud Shell (remembering to replace [PROJECT_ID]
 
 [Secrets setup script](https://github.com/burningglass/registrationgui/blob/main/server/grantSecretsAccessToServiceAccount.sh)
 
-Refreshing Secret Manager should reveal all secrets now established:
+Refreshing Secret Manager should reveal all secrets now established:<br/>
 `SVR_APP_AUTHSERVER_HOST`<br/>
 `SVR_APP_AUTHSERVER_CLIENT_ID`<br/>
 `SVR_APP_AUTHSERVER_CLIENT_SECRET`<br/>
@@ -711,17 +675,17 @@ Back in the desktop environment, create a file called Deployment.yaml in the reg
 
 The complete example available in Github:
 
-[Backend Deployment.yaml](https://github.com/burningglass/registrationgui/blob/main/server/Deployment.yaml
+[Backend Deployment.yaml](https://github.com/burningglass/registrationgui/blob/main/server/Deployment.yaml)
 
 As with the registrationstore service, this Deployment will invoke an init container at startup to create a run-time settings file in the following memory-mounted folder (inside the Pod): 
 
-`/var/.props/.cfg`<br/>
+`/var/.props/.cfg`
 
 This .cfg carries the runtime secrets (established in section 8)
 
 The second part of the Deployment invokes the main application container, i.e. the Node.js Express (Backend) app is launched from its image (in Google Container Registry)
 
-### 9.3 Create the Frontend 'Deployment' configuration (as .yaml)
+### 9.4 Create the Frontend 'Deployment' configuration (as .yaml)
 
 Also in the desktop environment, create a file called Deployment.yaml in the registrationgui/client project folder
 
@@ -729,15 +693,19 @@ The complete example available in Github:
 
 [Frontend Deployment.yaml](https://github.com/burningglass/registrationgui/blob/main/client/Deployment.yaml)
 
-This service also carries init container logic (see above) to create its runtime secret settings file:
+This Deployment also carries init container logic (see above) to create its runtime secret settings file (in the Pod it starts):
 
-`/var/.props/.cfg`<br/>
+`/var/.props/.cfg`
 
 The second part of the Deployment.yaml describes the main application container, i.e. the Node.js React (Frontend) app is launched from its Docker image (in Google Container Registry)
 
-### 9.4 Create the Backend 'Service' configuration (as .yaml)
+### 9.5 Create the Backend 'Service' configuration (as .yaml)
 
 Also in the desktop environment, create a file called Service.yaml in the registrationgui/server project folder
+
+See Github:
+
+[Backend Service.yaml](https://github.com/burningglass/registrationgui/blob/main/server/Service.yaml)
 
 ```
 apiVersion: v1
@@ -754,13 +722,13 @@ spec:
   type: LoadBalancer
 ```
 
-The complete example available in Github:
-
-[Backend Service.yaml](https://github.com/burningglass/registrationgui/blob/main/server/Service.yaml
-
-### 9.5 Create the Frontend 'Service' configuration (as .yaml)
+### 9.6 Create the Frontend 'Service' configuration (as .yaml)
 
 Also in the desktop environment, create a file called Service.yaml in the registrationgui/client project folder
+
+See Github:
+
+[Frontend Service.yaml](https://github.com/burningglass/registrationgui/blob/main/client/Service.yaml)
 
 ```
 apiVersion: v1
@@ -777,29 +745,25 @@ spec:
   type: LoadBalancer
 ```
 
-The complete example available in Github:
+### 9.7 Commit and Push the new files to GitHub
 
-[Frontend Service.yaml](https://github.com/burningglass/registrationgui/blob/main/client/Service.yaml
-
-### 9.6 Commit and Push the new files to GitHub
-
-`cd %HOMEPATH%`\projects\registrationgui\server</br>
+`cd %HOMEPATH%\projects\registrationgui\server`</br>
 `git add Deployment.yaml`<br/>
 `git add Service.yaml`<br/>
 
-`cd %HOMEPATH%`\projects\registrationgui\client</br>
+`cd %HOMEPATH%\projects\registrationgui\client`</br>
 `git add Deployment.yaml`<br/>
 `git add Service.yaml`<br/>
 
 `git commit -m “K8S installation/config artifacts”`<br/>
 `git push`
 
-### 9.7 Git Pull the above yaml files in GShell
+### 9.8 Git Pull the above yaml files in GCloud Shell
 
 `cd ~/projects/registrationgui`<br/>
 `git pull`
 
-### 9.8 Modify both Deployment.yamls and replace PROJECT_ID placeholders
+### 9.9 Modify both Deployment.yamls and replace PROJECT_ID placeholders
 
 `gcloud projects list` retrieves the PROJECT_ID
 
@@ -814,8 +778,8 @@ Replace the value 'PROJECT_ID' within the image reference: `image: gcr.io/PROJEC
 `cd ~/projects/registrationgui/client`<br/>
 `nano Deployment.yaml`<br/>
 
-Replace the value “PROJECT_ID” under `env: -name: PROJECT_ID`<br/>
-Replace the value “PROJECT_ID” within the image reference: `image: gcr.io/PROJECT_ID/registrationguiclient:v1.0.0`
+Replace the value 'PROJECT_ID' under `env: -name: PROJECT_ID`<br/>
+Replace the value 'PROJECT_ID' within the image reference: `image: gcr.io/PROJECT_ID/registrationguiclient:v1.0.0`
 
 ### 9.10 Install Deployment.yamls to K8s (in GCloud):
 
@@ -831,7 +795,7 @@ Note. `-n` specifies the K8s namespace (it's optional)
 
 Each Deployment will create a single Pod instance (initially in 'ContainerCreating' state and eventually hit 'Running' state)
 
-### 9.12 Install Service.yamls to K8s (in GCloud)
+### 9.11 Install Service.yamls to K8s (in GCloud)
 
 `cd ~/projects/registrationgui/server`<br/>
 `kubectl apply -f Service.yaml -n default`<br/>
@@ -843,17 +807,16 @@ Each Deployment will create a single Pod instance (initially in 'ContainerCreati
 
 Note. `-n` specifies the K8s namespace (it's optional)
 
-The above will create LoadBalancers for each service (initially in '<pending>' state and eventually showing the EXTERNAL-IPs each service is listening on, these LoadBalancers will direct all traffic to the respective Pods above)
+The above will create LoadBalancers for each service (initially in '\<pending\>' state and eventually showing the EXTERNAL-IPs each service is listening on, these LoadBalancers will direct all traffic to the respective Pods above)
 
-### 9.13 Test the application now running on K8s (in GCloud)
+### 9.12 Test the application now running on K8s (in GCloud)
 
 `curl https://[EXTERNAL-IP(for Registrationgui Server/ see above)]/colours`<br/>
 `curl https://[EXTERNAL-IP(for Registrationgui Client/ see above)]`
 
 
 
-# Registration Web App
-React app (front-end with back-end) to capture and display car interest registrations
+# Ignore this section
 
 ## H2
 
