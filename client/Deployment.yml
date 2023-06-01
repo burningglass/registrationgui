@@ -1,0 +1,39 @@
+fapiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: registrationguiclient
+  namespace: default
+  labels:
+    app: registrationguiclient
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: registrationguiclient
+  template:
+    metadata:
+      labels:
+        app: registrationguiclient
+    spec:
+      containers:
+      - name: main
+        image: gcr.io/[PROJECT_ID]/registrationguiclient:v1.0.0
+        resources:
+          requests:
+            cpu: 100m
+        tty: true
+        env:
+        - name: REACT_APP_LOGIN_URI
+          value: https://[SERVER_LOADBALANCER_IPADDR]/login
+        - name: REACT_APP_LOGOUT_URI
+          value: https://[SERVER_LOADBALANCER_IPADDR]/logout
+        - name: REACT_APP_GET_ACTIVEUSER_URI
+          value: https://[SERVER_LOADBALANCER_IPADDR]/user
+        - name: REACT_APP_GET_MODELS_URI
+          value: https://[SERVER_LOADBALANCER_IPADDR]/models
+        - name: REACT_APP_GET_COLOURS_URI
+          value: https://[SERVER_LOADBALANCER_IPADDR]/colours
+        - name: REACT_APP_GET_VALIDATION_ERRORS_URI
+          value: https://[SERVER_LOADBALANCER_IPADDR]/validationerrors
+        - name: REACT_APP_REGISTRATION_OPS_URI
+          value: https://[SERVER_LOADBALANCER_IPADDR]/registrations
